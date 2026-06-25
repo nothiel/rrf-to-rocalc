@@ -10,6 +10,37 @@
 
 import type { EquipmentResult, EquippedItem, RandomOption } from "./extract-equipment";
 
+// ── rAthena job ID → rocalc class ID ───────────────────────────────────
+// 4th classes share the same IDs in both systems.
+// Source: tong-calc-ro ClassIcon / ClassIDEnum.
+
+const RATHENA_TO_ROCALC_CLASS: Record<number, number> = {
+  4073: 11,   // Royal Guard
+  4060: 12,   // Rune Knight
+  4063: 7,    // Arch Bishop
+  4077: 13,   // Sura
+  4062: 2,    // Ranger
+  4075: 21,   // Minstrel
+  4076: 22,   // Wanderer
+  4065: 5,    // Guillotine Cross
+  4079: 4,    // Shadow Chaser
+  4061: 6,    // Warlock
+  4074: 8,    // Sorcerer
+  4064: 10,   // Mechanic
+  4078: 9,    // Genetic
+  4240: 3,    // Soul Reaper
+  4239: 33,   // Star Emperor
+  4215: 1,    // Rebellion
+  4218: 31,   // Doram
+  4190: 30,   // Super Novice
+  4212: 17,   // Oboro
+  4211: 18,   // Kagerou
+};
+
+export function rathenaJobToRocalcClass(rathenaJobId: number): number {
+  return RATHENA_TO_ROCALC_CLASS[rathenaJobId] ?? rathenaJobId;
+}
+
 // ── Slot order → rocalc short-key prefix (URL JSON format) ──────────────
 // The URL uses short keys: w=weapon, hu=headUpper, etc.
 // Cards: weapons use c1/c2/c3/c4; other gear uses c for cards[0].
@@ -298,7 +329,7 @@ export function buildRocalcPayload(
   }
 
   const payload = {
-    c: overrides.classId ?? 0,
+    c: overrides.classId != null ? rathenaJobToRocalcClass(overrides.classId) : 0,
     l: overrides.baseLevel ?? 1,
     j: overrides.jobLevel ?? 1,
     s: overrides.stats ?? [1, 1, 1, 1, 1, 1],
